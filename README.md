@@ -47,6 +47,15 @@ Once we have the modem location we can configure PyCharm. To do this:
 * Change device type to: Raspberry Pi Pico
 * Set the device path to the result of the above `ls` command
 
+## Project Configuration
+Before we flash the code to the Pi Pico we need to configure the environment specific settings.
+
+The project code contains a template settings file called: `settings_template.py`. Start by making a copy of this file:
+
+`cp settings_template.py settings.py`
+
+Then edit this new `settings.py` file with the specifics of your Wifi network and MQTT setup etc.
+
 ## Loading the Pi Pico W with the project code
 TODO
 

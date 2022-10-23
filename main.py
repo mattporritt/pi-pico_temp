@@ -1,11 +1,14 @@
-from machine import Pin
+import settings
+import network
+import machine
 import time
+from code.wifi import wifi
 
-led = Pin("LED", Pin.OUT)
 
-while True:
-    led(1)
-    time.sleep(1)
-    led(0)
-    time.sleep(1)
-    print("hello")
+led = machine.Pin("LED", machine.Pin.OUT)
+
+
+try:
+    wifi.connect(settings.WIFI['ssid'], settings.WIFI['password'])
+except KeyboardInterrupt:
+    machine.reset()
