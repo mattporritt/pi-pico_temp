@@ -8,3 +8,4 @@ while True:
     time.sleep(1)
     led(0)
     time.sleep(1)
+    print("hello")

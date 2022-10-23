@@ -2,7 +2,12 @@
 A project to measure temp and humidity using a Pi Pico W.
 Uses a x temp and humidity sensor and the output is displayed on an y eink display.  Measurements are also sent to a MQTT server
 
-# Get the code
+# Set up and install
+The following instructions are a rough guide on how to install the code and run it on the Pi Pico.
+
+Instructions assume the host machine is using MacOS.
+
+## Get the code
 Clone this repository to a directory on your host machine:
 
 `git clone git@github.com:mattporritt/pi-pico_temp.git`
@@ -29,7 +34,20 @@ To do this:
 * Finally open the location you downloaded the repository as a new Python project from existing sources.
 
 Next we need to configure Pycharm to connect to the Pi Pico W so the code can be loaded.
+First we need to find the address of the USB Modem of the Pi Pico.
+To do this run the following command:
+
+`ls -ls /dev/cu.*`
+
+We're looking for a response that looks like: `/dev/cu.usbmodem401101`
+
+Once we have the modem location we can configure PyCharm. To do this:
+* Go to PyCharm Preferences > Languages and Frameworks & > MicroPython
+* Check: Enable MicroPython support
+* Change device type to: Raspberry Pi Pico
+* Set the device path to the result of the above `ls` command
 
 ## Loading the Pi Pico W with the project code
+TODO
 
 
