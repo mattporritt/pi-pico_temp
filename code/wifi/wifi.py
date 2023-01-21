@@ -10,3 +10,5 @@ def connect(ssid, password):
         print('Waiting for connection...')
         time.sleep(1)
     print(wlan.ifconfig())
+    #TODO: make it more like this: https://how2electronics.com/getting-started-with-raspberry-pi-pico-w-using-micropython/
+
