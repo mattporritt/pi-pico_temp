@@ -4,6 +4,7 @@ import time
 from wifi import wifi
 import dht
 from epaper import epaper
+import framebuf
 
 
 led = machine.Pin("LED", machine.Pin.OUT)
@@ -18,6 +19,16 @@ try:
     wifi.connect(settings.WIFI['ssid'], settings.WIFI['password'])
 except KeyboardInterrupt:
     machine.reset()
+
+# Load the test image
+with open('pics/eink_test_4.pbm', 'rb') as f:
+    f.readline() #Magic number
+    f.readline() #Creator comment
+    f.readline() #Dimensions
+    data = bytearray(f.read())
+
+fbuf = framebuf.FrameBuffer(data, 122, 250, framebuf.MONO_HLSB)
+
 i = 0
 while (True):
     # See: https://www.waveshare.com/wiki/Pico-ePaper-2.13#Precautions
@@ -34,8 +45,11 @@ while (True):
     hum = sensor.humidity()
 
     epd.fill(0xff)
-    epd.text("Temp: {}C".format(temp), 0, 10, 0x00)
-    epd.text("Humidity: {:.0f}% ".format(hum), 0, 30, 0x00)
+
+    epd.blit(fbuf, 0, 0)
+
+    #epd.text("Temp: {}C".format(temp), 0, 10, 0x00)
+    #epd.text("Humidity: {:.0f}% ".format(hum), 0, 30, 0x00)
 
     if i < 5:
         epd.displayPartial(epd.buffer)
