@@ -4,6 +4,7 @@ import time
 from wifi import wifi
 import dht
 from epaper import epaper
+from imggen import imggen
 import framebuf
 
 
@@ -20,14 +21,15 @@ try:
 except KeyboardInterrupt:
     machine.reset()
 
-# Load the test image
-with open('pics/eink_test_4.pbm', 'rb') as f:
+# Load the background image
+with open('pics/background.pbm', 'rb') as f:
     f.readline() #Magic number
-    f.readline() #Creator comment
-    f.readline() #Dimensions
+    f.readline()
+    f.readline()
     data = bytearray(f.read())
 
-fbuf = framebuf.FrameBuffer(data, 122, 250, framebuf.MONO_HLSB)
+background_buffer = framebuf.FrameBuffer(data, 122, 250, framebuf.MONO_HLSB)
+imggen = imggen.ImageGenerator()
 
 i = 0
 while (True):
@@ -38,22 +40,26 @@ while (True):
     else:
         epd.init(epd.full_update)
         epd.Clear(0xff)  # Clear the paper display
+        epd.fill(0xff)
 
     # Get the DHT22 sensor measurements.
     sensor.measure()
     temp = sensor.temperature()
     hum = sensor.humidity()
 
-    epd.fill(0xff)
+    in_temp_buffer = imggen.float_to_image(temp)
+    background_buffer.blit(in_temp_buffer, 0, 24)
 
-    epd.blit(fbuf, 0, 0)
+    epd.blit(background_buffer, 0, 0)
 
     #epd.text("Temp: {}C".format(temp), 0, 10, 0x00)
     #epd.text("Humidity: {:.0f}% ".format(hum), 0, 30, 0x00)
 
     if i < 5:
+        # Partial update.
         epd.displayPartial(epd.buffer)
     else:
+        # Full update
         epd.display(epd.buffer)
         i = 0
     epd.sleep()
