@@ -1,8 +1,9 @@
 import framebuf
-
+import gc
 
 class ImageGenerator:
     image_widths = {
+        '-': 12,
         '.': 8,
         '0': 19,
         '1': 17,
@@ -30,18 +31,29 @@ class ImageGenerator:
 
         buffer = bytearray((buffer_height * buffer_width) // 8)
         image_buffer = framebuf.FrameBuffer(buffer, buffer_width, buffer_height, framebuf.MONO_HLSB)
+        del buffer
+        gc.collect()
+
+        #image_buffer.fill(0xff)
 
         buffer_offset = 0
         for character in value_string:
             character_buffer = self.get_frame_buffer(character)
-            image_buffer.blit(character_buffer['buffer'], buffer_offset, 0)
+            image_buffer.blit(character_buffer['buffer'], buffer_offset, (buffer_height - character_buffer['height']))
+            #image_buffer.blit(character_buffer['buffer'], buffer_offset, buffer_height)
             buffer_offset += character_buffer['width']
+            del character_buffer
+            gc.collect()
 
+        del value_string
+        gc.collect()
         return image_buffer
 
     def get_frame_buffer(self, character: str) -> dict:
         if character == '.':
             filename = '../pics/dec.pbm'
+        elif character == '-':
+            filename = '../pics/neg.pbm'
         else:
             filename = '../pics/{}.pbm'.format(character)
 
@@ -52,10 +64,13 @@ class ImageGenerator:
             data = bytearray(f.read())
 
         fbuf = framebuf.FrameBuffer(data, image_width, image_height, framebuf.MONO_HLSB)
+        del data
+        gc.collect()
 
         return {
             'buffer': fbuf,
-            'width': image_width
+            'width': image_width,
+            'height': image_height
         }
 
     def get_buffer_width(self, value_string: str) -> int:
