@@ -6,10 +6,8 @@ import dht
 from epaper import epaper
 from imggen import imggen
 import framebuf
-import micropython
 import gc
 
-#led = machine.Pin("LED", machine.Pin.OUT)
 sensor = dht.DHT22(machine.Pin(2)) # For future reference Pin2 is GPIO 2 not pin 2 on the board.
 epd = epaper.EPD_2in13()
 epd.init(epd.full_update)
@@ -38,7 +36,7 @@ i = 0
 while (True):
     # See: https://www.waveshare.com/wiki/Pico-ePaper-2.13#Precautions
     # For rules around use
-    if i < 5:
+    if i < 10:
         epd.init(epd.part_update)
     else:
         epd.init(epd.full_update)
@@ -49,19 +47,33 @@ while (True):
     temp = sensor.temperature()
     hum = sensor.humidity()
 
-    #print('temp from sensor {}'.format(temp))
-    in_temp_buffer = imggen.float_to_image(temp)
+    in_temp = imggen.float_to_image(temp, 1, 'lg')
     #print(micropython.mem_info())
-    background_buffer.blit(in_temp_buffer, 0, 24)
-    del in_temp_buffer
+    background_buffer.blit(in_temp['buffer'], 0, 24)
+    in_temp_offset = in_temp['offset']
+    del in_temp
+    gc.collect()
+
+    in_temp_sym = imggen.get_sym_buffer('sym_degc')
+    background_buffer.blit(in_temp_sym, in_temp_offset, 24)
+    del in_temp_sym
+    gc.collect()
+
+    in_humid = imggen.float_to_image(hum, 0, 'lg')
+    background_buffer.blit(in_humid['buffer'], 0, 55)
+    in_humid_offset = in_humid['offset']
+    del in_humid
+    gc.collect()
+
+    in_humid_sym = imggen.get_sym_buffer('sym_hum')
+    background_buffer.blit(in_humid_sym, in_humid_offset, 55)
+    del in_humid_sym
     gc.collect()
 
     epd.fill(0xff)
     epd.blit(background_buffer, 0, 0)
 
-    #epd.text("Temp: {}C".format(temp), 0, 10, 0x00)
-    #epd.text("Humidity: {:.0f}% ".format(hum), 0, 30, 0x00)
-    if i < 5:
+    if i < 10:
         print('Partial update.')
         epd.displayPartial(epd.buffer)
     else:
@@ -72,13 +84,7 @@ while (True):
 
     print("Temperature: {}°C   Humidity: {:.0f}% ".format(temp, hum))
     i += 1
-    time.sleep(5)
-
-# while (True):
-#     led.on()
-#     time.sleep(0.5)
-#     led.off()
-#     time.sleep(0.5)
+    time.sleep(60)
 
 #TODO: MQTT
 # https://github.com/micropython/micropython-lib/tree/master/micropython

@@ -1,6 +1,7 @@
 import framebuf
 import gc
 
+
 class ImageGenerator:
     image_widths = {
         '-': 12,
@@ -14,10 +15,10 @@ class ImageGenerator:
         '6': 18,
         '7': 20,
         '8': 18,
-        '9': 18,
+        '9': 18
     }
 
-    def float_to_image(self, num: float, places: int = 1, size: str = 'lg', suffix: str = '') -> framebuf.FrameBuffer:
+    def float_to_image(self, num: float, places: int = 1, size: str = 'lg') -> dict:
 
         # Convert the number into a string with the defined number of decimal places.
         value_string = '{:.{prec}f}'.format(num, prec=places)
@@ -34,20 +35,20 @@ class ImageGenerator:
         del buffer
         gc.collect()
 
-        #image_buffer.fill(0xff)
-
         buffer_offset = 0
         for character in value_string:
             character_buffer = self.get_frame_buffer(character)
             image_buffer.blit(character_buffer['buffer'], buffer_offset, (buffer_height - character_buffer['height']))
-            #image_buffer.blit(character_buffer['buffer'], buffer_offset, buffer_height)
             buffer_offset += character_buffer['width']
             del character_buffer
             gc.collect()
 
         del value_string
         gc.collect()
-        return image_buffer
+        return {
+            'buffer': image_buffer,
+            'offset': buffer_offset
+        }
 
     def get_frame_buffer(self, character: str) -> dict:
         if character == '.':
@@ -72,6 +73,21 @@ class ImageGenerator:
             'width': image_width,
             'height': image_height
         }
+
+    def get_sym_buffer(self, sym: str) -> framebuf.FrameBuffer:
+        filename = '../pics/{}.pbm'.format(sym)
+
+        with open(filename, 'rb') as f:
+            f.readline()  # Magic number
+            image_width = int(f.readline())
+            image_height = int(f.readline())
+            data = bytearray(f.read())
+
+        fbuf = framebuf.FrameBuffer(data, image_width, image_height, framebuf.MONO_HLSB)
+        del data
+        gc.collect()
+
+        return fbuf
 
     def get_buffer_width(self, value_string: str) -> int:
         buffer_width = 0
