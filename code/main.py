@@ -109,13 +109,35 @@ while (True):
 
     out_uv = imggen.float_to_image(outuv, 0, 'sml')
     background_buffer.blit(out_uv['buffer'], 24, 178)
-    out_uv_offset = out_uv['offset'] + 24
+    out_uv_offset = out_uv['offset'] + 26
     del out_uv
     gc.collect()
 
     out_uv_sym = imggen.get_sym_buffer('sym_uv')
     background_buffer.blit(out_uv_sym, out_uv_offset, 178)
     del out_uv_sym
+    gc.collect()
+
+    out_wind = imggen.float_to_image(outwind, 0, 'sml')
+    background_buffer.blit(out_wind['buffer'], 24, 204)
+    out_wind_offset = out_wind['offset'] + 26
+    del out_wind
+    gc.collect()
+
+    out_wind_sym = imggen.get_sym_buffer('sym_kmh')
+    background_buffer.blit(out_wind_sym, out_wind_offset, 204)
+    del out_wind_sym
+    gc.collect()
+
+    out_pressure = imggen.float_to_image(outpressure, 0, 'sml')
+    background_buffer.blit(out_pressure['buffer'], 24, 229)
+    out_pressure_offset = out_pressure['offset'] + 26
+    del out_pressure
+    gc.collect()
+
+    out_pressure_sym = imggen.get_sym_buffer('sym_hpa')
+    background_buffer.blit(out_pressure_sym, out_pressure_offset, 229)
+    del out_pressure_sym
     gc.collect()
 
     epd.fill(0xff)
