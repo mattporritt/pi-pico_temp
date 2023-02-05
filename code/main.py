@@ -144,6 +144,12 @@ while (True):
     del out_pressure_sym
     gc.collect()
 
+    wifi_strength = wlan.getStrength()
+    wifi_sym = imggen.get_wifi_buffer(wifi_strength)
+    background_buffer.blit(wifi_sym, 97, 0)
+    del wifi_sym
+    gc.collect()
+
     epd.fill(0xff)
     epd.blit(background_buffer, 0, 0)
 
@@ -158,7 +164,7 @@ while (True):
 
     print("Temperature: {}°C   Humidity: {:.0f}% ".format(intemp, inhum))
     i += 1
-    print(wlan.getStrength())
+    print(wifi_strength)
     gc.collect()
     print('execution time: {:.4f} seconds'.format(time.time() - start_time))
     time.sleep(60)

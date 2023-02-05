@@ -126,3 +126,13 @@ class ImageGenerator:
                 buffer_width += self.image_widths_sml[character]
 
         return buffer_width
+
+    def get_wifi_buffer(self, rssi: int) -> framebuf.FrameBuffer:
+        if rssi >= -50:
+            sym = 'wifi_hi'
+        elif -50 > rssi >= -70:
+            sym = 'wifi_med'
+        else:
+            sym = 'wifi_low'
+
+        return self.get_sym_buffer(sym)
