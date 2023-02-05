@@ -1,5 +1,6 @@
 import framebuf
 import gc
+import sys
 
 
 class ImageGenerator:
@@ -58,11 +59,14 @@ class ImageGenerator:
         else:
             filename = '../pics/{}.pbm'.format(character)
 
-        with open(filename, 'rb') as f:
-            f.readline()  # Magic number
-            image_width = int(f.readline())
-            image_height = int(f.readline())
-            data = bytearray(f.read())
+        try:
+            with open(filename, 'rb') as f:
+                f.readline()  # Magic number
+                image_width = int(f.readline())
+                image_height = int(f.readline())
+                data = bytearray(f.read())
+        except EnvironmentError:
+            sys.exit()
 
         fbuf = framebuf.FrameBuffer(data, image_width, image_height, framebuf.MONO_HLSB)
         del data
