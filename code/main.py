@@ -38,6 +38,7 @@ gc.collect()
 
 imggen = imggen.ImageGenerator()
 i = 0
+
 while (True):
     # See: https://www.waveshare.com/wiki/Pico-ePaper-2.13#Precautions
     # For rules around use
@@ -50,10 +51,19 @@ while (True):
     # Get the DHT22 sensor measurements.
     sensor.measure()
     time.sleep_ms(100)
-    temp = sensor.temperature()
-    hum = sensor.humidity()
+    intemp = sensor.temperature()
+    inhum = sensor.humidity()
 
-    in_temp = imggen.float_to_image(temp, 1, 'lg')
+    # TODO: MQTT
+    # https://github.com/micropython/micropython-lib/tree/master/micropython
+    # https://mpython.readthedocs.io/en/master/library/mPython/umqtt.simple.html
+    outtemp = intemp + 1
+    outhum = inhum + 1
+    outuv = 13
+    outwind = 33.3
+    outpressure = 1008.3
+
+    in_temp = imggen.float_to_image(intemp, 1, 'lg')
     background_buffer.blit(in_temp['buffer'], 0, 24)
     in_temp_offset = in_temp['offset']
     del in_temp
@@ -64,7 +74,7 @@ while (True):
     del in_temp_sym
     gc.collect()
 
-    in_humid = imggen.float_to_image(hum, 0, 'lg')
+    in_humid = imggen.float_to_image(inhum, 0, 'lg')
     background_buffer.blit(in_humid['buffer'], 0, 55)
     in_humid_offset = in_humid['offset']
     del in_humid
@@ -73,6 +83,28 @@ while (True):
     in_humid_sym = imggen.get_sym_buffer('sym_hum')
     background_buffer.blit(in_humid_sym, in_humid_offset, 55)
     del in_humid_sym
+    gc.collect()
+
+    out_temp = imggen.float_to_image(outtemp, 1, 'lg')
+    background_buffer.blit(out_temp['buffer'], 0, 112)
+    out_temp_offset = out_temp['offset']
+    del out_temp
+    gc.collect()
+
+    out_temp_sym = imggen.get_sym_buffer('sym_degc')
+    background_buffer.blit(out_temp_sym, out_temp_offset, 112)
+    del out_temp_sym
+    gc.collect()
+
+    out_humid = imggen.float_to_image(outhum, 0, 'lg')
+    background_buffer.blit(out_humid['buffer'], 0, 143)
+    out_humid_offset = out_humid['offset']
+    del out_humid
+    gc.collect()
+
+    out_humid_sym = imggen.get_sym_buffer('sym_hum')
+    background_buffer.blit(out_humid_sym, out_humid_offset, 143)
+    del out_humid_sym
     gc.collect()
 
     epd.fill(0xff)
@@ -87,11 +119,7 @@ while (True):
         i = 0
     epd.sleep()
 
-    print("Temperature: {}°C   Humidity: {:.0f}% ".format(temp, hum))
+    print("Temperature: {}°C   Humidity: {:.0f}% ".format(intemp, inhum))
     i += 1
+    gc.collect()
     time.sleep(60)
-
-#TODO: MQTT
-# https://github.com/micropython/micropython-lib/tree/master/micropython
-# https://mpython.readthedocs.io/en/master/library/mPython/umqtt.simple.html
-

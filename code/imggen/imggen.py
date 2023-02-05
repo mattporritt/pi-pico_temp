@@ -38,7 +38,7 @@ class ImageGenerator:
 
         buffer_offset = 0
         for character in value_string:
-            character_buffer = self.get_frame_buffer(character)
+            character_buffer = self.get_frame_buffer(character, size)
             image_buffer.blit(character_buffer['buffer'], buffer_offset, (buffer_height - character_buffer['height']))
             buffer_offset += character_buffer['width']
             del character_buffer
@@ -51,13 +51,21 @@ class ImageGenerator:
             'offset': buffer_offset
         }
 
-    def get_frame_buffer(self, character: str) -> dict:
-        if character == '.':
-            filename = '../pics/dec.pbm'
-        elif character == '-':
-            filename = '../pics/neg.pbm'
+    def get_frame_buffer(self, character: str, size: str) -> dict:
+        if size == 'lg':
+            if character == '.':
+                filename = '../pics/dec.pbm'
+            elif character == '-':
+                filename = '../pics/neg.pbm'
+            else:
+                filename = '../pics/{}.pbm'.format(character)
         else:
-            filename = '../pics/{}.pbm'.format(character)
+            if character == '.':
+                filename = '../pics/sdec.pbm'
+            elif character == '-':
+                filename = '../pics/sneg.pbm'
+            else:
+                filename = '../pics/s{}.pbm'.format(character)
 
         try:
             with open(filename, 'rb') as f:
