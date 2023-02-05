@@ -97,14 +97,25 @@ while (True):
     gc.collect()
 
     out_humid = imggen.float_to_image(outhum, 0, 'lg')
-    background_buffer.blit(out_humid['buffer'], 0, 143)
+    background_buffer.blit(out_humid['buffer'], 0, 144)
     out_humid_offset = out_humid['offset']
     del out_humid
     gc.collect()
 
     out_humid_sym = imggen.get_sym_buffer('sym_hum')
-    background_buffer.blit(out_humid_sym, out_humid_offset, 143)
+    background_buffer.blit(out_humid_sym, out_humid_offset, 144)
     del out_humid_sym
+    gc.collect()
+
+    out_uv = imggen.float_to_image(outuv, 0, 'sml')
+    background_buffer.blit(out_uv['buffer'], 24, 178)
+    out_uv_offset = out_uv['offset'] + 24
+    del out_uv
+    gc.collect()
+
+    out_uv_sym = imggen.get_sym_buffer('sym_uv')
+    background_buffer.blit(out_uv_sym, out_uv_offset, 178)
+    del out_uv_sym
     gc.collect()
 
     epd.fill(0xff)

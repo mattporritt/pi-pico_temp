@@ -19,17 +19,32 @@ class ImageGenerator:
         '9': 18
     }
 
+    image_widths_sml = {
+        '-': 3,
+        '.': 3,
+        '0': 11,
+        '1': 7,
+        '2': 11,
+        '3': 11,
+        '4': 11,
+        '5': 11,
+        '6': 11,
+        '7': 11,
+        '8': 11,
+        '9': 11
+    }
+
     def float_to_image(self, num: float, places: int = 1, size: str = 'lg') -> dict:
 
         # Convert the number into a string with the defined number of decimal places.
         value_string = '{:.{prec}f}'.format(num, prec=places)
 
-        buffer_width = self.get_buffer_width(value_string)
-
         if size == 'lg':
             buffer_height = 23
+            buffer_width = self.get_buffer_width(value_string, size)
         else:
             buffer_height = 15
+            buffer_width = self.get_buffer_width(value_string, size)
 
         buffer = bytearray((buffer_height * buffer_width) // 8)
         image_buffer = framebuf.FrameBuffer(buffer, buffer_width, buffer_height, framebuf.MONO_HLSB)
@@ -101,10 +116,13 @@ class ImageGenerator:
 
         return fbuf
 
-    def get_buffer_width(self, value_string: str) -> int:
+    def get_buffer_width(self, value_string: str, size: str) -> int:
         buffer_width = 0
 
         for character in value_string:
-            buffer_width += self.image_widths[character]
+            if size == 'lg':
+                buffer_width += self.image_widths[character]
+            else:
+                buffer_width += self.image_widths_sml[character]
 
         return buffer_width
