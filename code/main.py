@@ -14,7 +14,8 @@ sensor = dht.DHT22(machine.Pin(2)) # For future reference Pin2 is GPIO 2 not pin
 sensor.measure()
 time.sleep(10)
 
-wifi.connect(settings.WIFI['ssid'], settings.WIFI['password'])
+wlan = wifi.Wifi()
+wlan.connect(settings.WIFI['ssid'], settings.WIFI['password'])
 
 # Have a look at implementing the main entry point
 # https://blog.jetbrains.com/pycharm/2018/01/micropython-plugin-for-pycharm/
@@ -39,7 +40,10 @@ gc.collect()
 imggen = imggen.ImageGenerator()
 i = 0
 
+# TODO: add watchdog.
+
 while (True):
+    start_time = time.time()
     # See: https://www.waveshare.com/wiki/Pico-ePaper-2.13#Precautions
     # For rules around use
     if i < 10:
@@ -154,5 +158,7 @@ while (True):
 
     print("Temperature: {}°C   Humidity: {:.0f}% ".format(intemp, inhum))
     i += 1
+    print(wlan.getStrength())
     gc.collect()
+    print('execution time: {:.4f} seconds'.format(time.time() - start_time))
     time.sleep(60)
